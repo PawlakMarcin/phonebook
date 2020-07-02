@@ -1,66 +1,59 @@
 package pl.agh.phonebook;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.app.ActivityCompat;
+import androidx.viewpager.widget.ViewPager;
 
-import android.content.Intent;
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.tabs.TabLayout;
 
-import pl.agh.phonebook.dao.ContactDAO;
-import pl.agh.phonebook.model.Contact;
+import pl.agh.phonebook.adapters.ViewPagerAdapter;
+import pl.agh.phonebook.fragments.FragmentCalls;
+import pl.agh.phonebook.fragments.FragmentContacts;
+import pl.agh.phonebook.fragments.FragmentDialer;
 
-public class MainActivity extends AppCompatActivity
-        implements CreateContactDialog.DialogListener {
+public class MainActivity extends AppCompatActivity {
 
-    private ContactDAO contactDAO;
-    private RecyclerView recyclerView;
 
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
+    private final int[] ICONS = {android.R.drawable.ic_menu_call,
+            android.R.drawable.ic_dialog_email,
+            android.R.drawable.ic_media_play};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = (RecyclerView) findViewById(R.id.contacts);
-        //optimization
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        tabLayout = findViewById(R.id.tabLayout);
+        viewPager = findViewById(R.id.viewPager);
 
-        contactDAO = new ContactDAO(this);
-        reloadContactList();
+        ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPagerAdapter.addFragment(new FragmentCalls(), "Calls");
+        viewPagerAdapter.addFragment(new FragmentDialer(), "Dialer");
+        viewPagerAdapter.addFragment(new FragmentContacts(), "Contacts");
+
+        viewPager.setAdapter(viewPagerAdapter);
+
+        tabLayout.setupWithViewPager(viewPager);
+
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            tab.setIcon(ICONS[i]);
+        }
     }
 
-    public void addContact(View view){
+    private void askPermissions(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_CALL_LOG)
+                != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, 1);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CALL_LOG}, 1);
 
-        openDialog();
-        reloadContactList();
-    }
-
-    public void openDialog(){
-        CreateContactDialog createContactDialog = new CreateContactDialog();
-        createContactDialog.show(getSupportFragmentManager(), "example dialog");
-    }
-
-    public void reloadContactList(){
-        List allContacts = contactDAO.getAllContacts();
-        recyclerView.setAdapter(new MyAdapter(allContacts, recyclerView));
-    }
-
-    @Override
-    public void applyTexts(String contactName, String contactEmail, String contactPhoneNumber) {
-        Contact contact = new Contact();
-        contact.setName(contactName);
-        contact.setEmail(contactEmail);
-        contact.setPhoneNumber(contactPhoneNumber);
-
-        contactDAO.insertContact(contact);
-        reloadContactList();
+        }
     }
 }

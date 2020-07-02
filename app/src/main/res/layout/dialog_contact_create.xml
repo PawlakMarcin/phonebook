@@ -8,21 +8,21 @@
     android:padding="30dp">
 
     <EditText
-        android:id="@+id/create_name"
+        android:id="@+id/createName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Contact name"
         android:inputType="text"
         android:textSize="22sp" />
     <EditText
-        android:id="@+id/create_email"
+        android:id="@+id/createEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email"
         android:inputType="text"
         android:textSize="22sp" />
     <EditText
-        android:id="@+id/create_phone_number"
+        android:id="@+id/createNumber"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Phone number"

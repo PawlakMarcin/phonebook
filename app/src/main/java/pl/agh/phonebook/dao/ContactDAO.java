@@ -7,18 +7,18 @@ import android.database.Cursor;
 import java.util.ArrayList;
 import java.util.List;
 
-import pl.agh.phonebook.database.DBHelper;
-import pl.agh.phonebook.model.Contact;
+import pl.agh.phonebook.database.DbHelper;
+import pl.agh.phonebook.model.ModelContact;
 
 public class ContactDAO {
 
-    private DBHelper dbHelper;
+    private DbHelper dbHelper;
 
     public ContactDAO(Context context){
-        dbHelper = new DBHelper(context);
+        dbHelper = new DbHelper(context);
     }
 
-    public void insertContact(final Contact contact){
+    public void insertContact(final ModelContact contact){
         ContentValues contentValues = new ContentValues();
         contentValues.put("contact_name", contact.getName());
         contentValues.put("contact_email", contact.getEmail());
@@ -27,7 +27,7 @@ public class ContactDAO {
         dbHelper.getWritableDatabase().insert("contacts", null, contentValues);
     }
 
-    public Contact getContactById(final int id){
+    public ModelContact getContactById(final int id){
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
                 "select * from contacts where _id = " + id, null);
         if (cursor.getCount() == 1){
@@ -37,13 +37,13 @@ public class ContactDAO {
         return null;
     }
 
-    public Contact mapCursorToContact(final Cursor cursor){
+    public ModelContact mapCursorToContact(final Cursor cursor){
         int idColumnId = cursor.getColumnIndex("_id");
         int textNameColumnId = cursor.getColumnIndex("contact_name");
         int textEmailColumnId = cursor.getColumnIndex("contact_email");
         int textPhoneNumberColumnId = cursor.getColumnIndex("contact_phone_number");
 
-        Contact contact = new Contact();
+        ModelContact contact = new ModelContact();
         contact.setId(cursor.getInt(idColumnId));
         contact.setName(cursor.getString(textNameColumnId));
         contact.setEmail(cursor.getString(textEmailColumnId));
@@ -52,7 +52,7 @@ public class ContactDAO {
         return contact;
     }
 
-    public void updateContact(final Contact contact){
+    public void updateContact(final ModelContact contact){
         ContentValues contentValues = new ContentValues();
         contentValues.put("contact_name", contact.getName());
         contentValues.put("contact_email", contact.getEmail());
@@ -60,14 +60,14 @@ public class ContactDAO {
 
         dbHelper.getWritableDatabase().update("contacts", contentValues,
                 " _id = ? ", new String[]{String.valueOf(contact.getId())}
-                );
+        );
     }
 
     public void deleteContactById(final int id){
         System.out.println("deleting: " + id);
         dbHelper.getWritableDatabase().delete("contacts",
-                    " _id = ? ", new String[]{String.valueOf(id)}
-                );
+                " _id = ? ", new String[]{String.valueOf(id)}
+        );
     }
 
     public List getAllContacts(){
