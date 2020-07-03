@@ -1,6 +1,8 @@
 package pl.agh.phonebook.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import pl.agh.phonebook.R;
+import pl.agh.phonebook.dao.ContactDAO;
+import pl.agh.phonebook.dialogs.DialogCreateContact;
+import pl.agh.phonebook.dialogs.DialogEditContact;
 import pl.agh.phonebook.model.ModelContact;
 
 public class RvContactsAdapter extends RecyclerView.Adapter<RvContactsAdapter.ViewHolder> {
@@ -20,9 +25,17 @@ public class RvContactsAdapter extends RecyclerView.Adapter<RvContactsAdapter.Vi
     private Context mContext;
     private List<ModelContact> mListContacts;
 
-    public RvContactsAdapter(Context context, List<ModelContact> listContacts){
+    private RecyclerView mRecyclerView;
+    private ContactDAO mContactDAO;
+    private RecyclerViewOnClickListener mListener;
+
+    public RvContactsAdapter(Context context, List<ModelContact> listContacts,
+                             RecyclerView recyclerView, RecyclerViewOnClickListener listener){
         mContext = context;
         mListContacts = listContacts;
+        mRecyclerView = recyclerView;
+        mContactDAO = new ContactDAO(context);
+        mListener = listener;
     }
 
     @NonNull
@@ -33,7 +46,27 @@ public class RvContactsAdapter extends RecyclerView.Adapter<RvContactsAdapter.Vi
         View view = layoutInflater.inflate(R.layout.item_contacts, parent, false);
 
         ViewHolder viewHolder = new ViewHolder(view);
+
+        view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                mListener.recyclerViewOnClick(mRecyclerView.getChildAdapterPosition(view), mListContacts);
+            }
+        });
+
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                return mListener.recyclerViewOnLongClick(mRecyclerView.getChildAdapterPosition(view), mListContacts);
+            }
+        });
+
         return viewHolder;
+    }
+
+    public interface RecyclerViewOnClickListener{
+        void recyclerViewOnClick(int position, List<ModelContact> listContact);
+        boolean recyclerViewOnLongClick(int position, List<ModelContact> listContact);
     }
 
     @Override

@@ -6,35 +6,41 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 
 import androidx.appcompat.app.AppCompatDialogFragment;
 
 import pl.agh.phonebook.R;
+import pl.agh.phonebook.model.ModelContact;
 
-public class DialogCreateContact extends AppCompatDialogFragment {
+public class DialogEditContact extends AppCompatDialogFragment {
     private EditText editTextName;
     private EditText editTextEmail;
     private EditText editTextPhoneNumber;
 
-    private DialogListener listener;
+    private ModelContact mContact;
+
+    public DialogEditContact(ModelContact modelContact){
+        mContact = modelContact;
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState){
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.dialog_contact_create, null);
+        View view = inflater.inflate(R.layout.dialog_contact_edit, null);
 
         builder.setView(view)
-                .setTitle("Create new contact")
+                .setTitle("Contact details")
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
                     }
                 })
-                .setPositiveButton("create", new DialogInterface.OnClickListener() {
+                .setPositiveButton("update", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
@@ -42,29 +48,31 @@ public class DialogCreateContact extends AppCompatDialogFragment {
                         String contactName = editTextName.getText().toString();
                         String contactEmail = editTextEmail.getText().toString();
                         String contactPhoneNumber = editTextPhoneNumber.getText().toString();
-                        dl.createContactSignal(contactName, contactEmail, contactPhoneNumber);
+                        dl.updateContactSignal(mContact.getId(), contactName, contactEmail, contactPhoneNumber);
                     }
                 });
-        editTextName = view.findViewById(R.id.createName);
-        editTextEmail = view.findViewById(R.id.createEmail);
-        editTextPhoneNumber = view.findViewById(R.id.createNumber);
+
+        Button button = view.findViewById(R.id.deleteContact);
+        button.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                DialogListener dl = (DialogListener)getTargetFragment();
+                dl.deleteContactSignal(mContact.getId());
+                dismiss();
+            }
+        });
+        editTextName = view.findViewById(R.id.updateName);
+        editTextEmail = view.findViewById(R.id.updateEmail);
+        editTextPhoneNumber = view.findViewById(R.id.updateNumber);
+        editTextName.setText(mContact.getName());
+        editTextEmail.setText(mContact.getEmail());
+        editTextPhoneNumber.setText(mContact.getPhoneNumber());
 
         return builder.create();
     }
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        try{
-//            listener = (DialogListener) context;
-//        } catch (ClassCastException e){
-//            throw new ClassCastException(context.toString() +
-//                    "DialogListener must be implemented!");
-//        }
-//    }
-
-
     public interface DialogListener{
-        void createContactSignal(String contactName, String contactEmail, String contactPhoneNumber);
+        void updateContactSignal(int contactId, String contactName, String contactEmail, String contactPhoneNumber);
+        void deleteContactSignal(int contactId);
     }
 }
