@@ -14,9 +14,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -44,6 +46,9 @@ public class FragmentCalls extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         RecyclerView.LayoutManager layoutManager = linearLayoutManager;
         recyclerView.setLayoutManager(layoutManager);
+
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+
 
         contactDao = new ContactDAO(getContext());
 
@@ -73,20 +78,45 @@ public class FragmentCalls extends Fragment {
         int date = cursor.getColumnIndex(CallLog.Calls.DATE);
         int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
 
-        cursor.moveToFirst();
-        while(cursor.moveToNext()){
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM");
+
+        cursor.moveToFirst();
+
+        do{
             if(contactDao.existsContactByNumber(cursor.getString(number))){
 
-                Date dateParsed = new Date(Long.valueOf(cursor.getString(date)));
+                Date dateExtracted = new Date(Long.valueOf(cursor.getString(date)));
+                String dateParsed = new SimpleDateFormat("dd.MM").format(dateExtracted);
+
+                String numberTmp = cursor.getString(number);
                 list.add(new ModelCall(
-                        cursor.getString(number),
+                        numberTmp,
+                        contactDao.getNameByNumber(numberTmp),
                         cursor.getString(duration),
-                        dateParsed.toString(),
+                        dateParsed,
                         cursor.getInt(type))
                 );
             }
-        }
+        }while(cursor.moveToNext());
+
+//        while(cursor.moveToNext()){
+//
+//            if(contactDao.existsContactByNumber(cursor.getString(number))){
+//
+//                Date dateExtracted = new Date(Long.valueOf(cursor.getString(date)));
+//                String dateParsed = new SimpleDateFormat("dd.MM").format(dateExtracted);
+//
+//                String numberTmp = cursor.getString(number);
+//                list.add(new ModelCall(
+//                        numberTmp,
+//                        contactDao.getNameByNumber(numberTmp),
+//                        cursor.getString(duration),
+//                        dateParsed,
+//                        cursor.getInt(type))
+//                );
+//            }
+//        }
         return list;
     }
 }

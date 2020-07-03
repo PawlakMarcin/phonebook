@@ -50,8 +50,27 @@ public class RvCallsAdapter extends RecyclerView.Adapter<RvCallsAdapter.ViewHold
         date = holder.date;
         type = holder.type;
 
-        name.setText(mListCalls.get(position).getNumber());
-        duration.setText(mListCalls.get(position).getDuration());
+        String nameTmp = mListCalls.get(position).getName();
+        if (nameTmp.length() > 0){
+            name.setText(nameTmp);
+        } else{
+            name.setText(mListCalls.get(position).getNumber());
+        }
+
+
+        int durationTmp = Integer.parseInt((mListCalls.get(position).getDuration()));
+        if (durationTmp < 60){
+            duration.setText(mListCalls.get(position).getDuration() + "s ");
+        } else {
+            int minTmp = (durationTmp / 60);
+            int secTmp = (durationTmp % 60);
+            if (secTmp == 0){
+                duration.setText(String.valueOf(minTmp) + "m ");
+            } else{
+                duration.setText(String.valueOf(minTmp) + "m " + String.valueOf(secTmp) + "s ");
+            }
+        }
+
         date.setText(mListCalls.get(position).getDate());
 
         int imageFlag = mListCalls.get(position).getImageFlag();

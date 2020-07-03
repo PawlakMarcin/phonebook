@@ -38,6 +38,29 @@ public class ContactDAO {
         return null;
     }
 
+    public String getNameByNumber(String number){
+
+        String numberTmp = number;
+        Log.d("numberTmpBEFORE:", numberTmp);
+        if (number.contains("+48")) {
+            numberTmp = number.substring(3);
+            Log.d("numberTmpAFTER_IF:", numberTmp);
+        }
+        Log.d("numberTmpAFTER_WITHOUT_IF:", numberTmp);
+
+        Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
+                "select * from contacts where contact_phone_number = '"+numberTmp +"'", null);
+        int index = cursor.getColumnIndex("contact_name");
+
+        Log.d("cursor.getCount(): ", String.valueOf(cursor.getCount()));
+
+        if(cursor.getCount() == 1){
+            cursor.moveToFirst();
+            return mapCursorToContact(cursor).getName();
+        }
+        return "";
+    }
+
     public ModelContact mapCursorToContact(final Cursor cursor){
         int idColumnId = cursor.getColumnIndex("_id");
         int textNameColumnId = cursor.getColumnIndex("contact_name");
@@ -92,12 +115,8 @@ public class ContactDAO {
     public boolean existsContactByNumber(String number){
 
         String numberTmp = number;
-        Log.d("numberBEFORE:", numberTmp);
-
         if (number.contains("+48")){
             numberTmp = number.substring(3);
-            Log.d("numberAFTER:", numberTmp);
-
         }
         Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
                 "select * from contacts where contact_phone_number = '"+numberTmp+"'",

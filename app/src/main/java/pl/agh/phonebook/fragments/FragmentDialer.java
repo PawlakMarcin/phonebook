@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +28,7 @@ public class FragmentDialer extends Fragment {
     private View v;
 
     EditText input;
-    Button bDel;
+    ImageButton bDel;
     Button bOne;
     Button bTwo;
     Button bThree;

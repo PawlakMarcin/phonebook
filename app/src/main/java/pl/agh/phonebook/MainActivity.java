@@ -21,9 +21,9 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
-    private final int[] ICONS = {android.R.drawable.ic_menu_call,
-            android.R.drawable.ic_dialog_email,
-            android.R.drawable.ic_media_play};
+    private final int[] ICONS = {android.R.drawable.ic_menu_recent_history,
+            android.R.drawable.ic_menu_call,
+            android.R.drawable.ic_menu_my_calendar};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
