@@ -23,12 +23,14 @@ import java.util.List;
 
 import pl.agh.phonebook.R;
 import pl.agh.phonebook.adapters.RvCallsAdapter;
+import pl.agh.phonebook.dao.ContactDAO;
 import pl.agh.phonebook.model.ModelCall;
 
 public class FragmentCalls extends Fragment {
 
     private View v;
     private RecyclerView recyclerView;
+    private ContactDAO contactDao;
 
     public FragmentCalls(){}
 
@@ -42,6 +44,8 @@ public class FragmentCalls extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         RecyclerView.LayoutManager layoutManager = linearLayoutManager;
         recyclerView.setLayoutManager(layoutManager);
+
+        contactDao = new ContactDAO(getContext());
 
         RvCallsAdapter adapter = new RvCallsAdapter(getContext(), getCallsLogs());
         recyclerView.setAdapter(adapter);
@@ -62,25 +66,26 @@ public class FragmentCalls extends Fragment {
                 null,
                 null,
                 null,
-                CallLog.Calls.DATE + " ASC");
+                CallLog.Calls.DATE + " DESC");
 
         int number = cursor.getColumnIndex(CallLog.Calls.NUMBER);
         int duration = cursor.getColumnIndex(CallLog.Calls.DURATION);
         int date = cursor.getColumnIndex(CallLog.Calls.DATE);
+        int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
 
         cursor.moveToFirst();
         while(cursor.moveToNext()){
 
-            Date dateParsed = new Date(Long.valueOf(cursor.getString(date)));
+            if(contactDao.existsContactByNumber(cursor.getString(number))){
 
-            list.add(new ModelCall(
-                    cursor.getString(number),
-                    cursor.getString(duration),
-                    dateParsed.toString()
-            ));
-
-            Log.d("MiC:: ", cursor.getString(number));
-
+                Date dateParsed = new Date(Long.valueOf(cursor.getString(date)));
+                list.add(new ModelCall(
+                        cursor.getString(number),
+                        cursor.getString(duration),
+                        dateParsed.toString(),
+                        cursor.getInt(type))
+                );
+            }
         }
         return list;
     }

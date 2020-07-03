@@ -1,9 +1,13 @@
 package pl.agh.phonebook.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.provider.CallLog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -39,14 +43,26 @@ public class RvCallsAdapter extends RecyclerView.Adapter<RvCallsAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         TextView name, duration, date;
+        ImageView type;
+
         name = holder.name;
         duration = holder.duration;
         date = holder.date;
+        type = holder.type;
 
         name.setText(mListCalls.get(position).getNumber());
         duration.setText(mListCalls.get(position).getDuration());
         date.setText(mListCalls.get(position).getDate());
 
+        int imageFlag = mListCalls.get(position).getImageFlag();
+
+        if (imageFlag == CallLog.Calls.INCOMING_TYPE){
+            type.setImageResource(android.R.drawable.sym_call_incoming);
+        } else if (imageFlag == CallLog.Calls.OUTGOING_TYPE){
+            type.setImageResource(android.R.drawable.sym_call_outgoing);
+        } else if (imageFlag == CallLog.Calls.MISSED_TYPE){
+            type.setImageResource(android.R.drawable.sym_call_missed);
+        }
     }
 
     @Override
@@ -57,12 +73,16 @@ public class RvCallsAdapter extends RecyclerView.Adapter<RvCallsAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         TextView name, duration, date;
+        ImageView type;
+
         public ViewHolder(View itemView){
             super(itemView);
 
             name = itemView.findViewById(R.id.callName);
             duration = itemView.findViewById(R.id.callDuration);
             date = itemView.findViewById(R.id.callDate);
+
+            type = itemView.findViewById(R.id.imageFlag);
         }
 
     }

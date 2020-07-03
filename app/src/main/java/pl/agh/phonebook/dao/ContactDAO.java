@@ -3,6 +3,7 @@ package pl.agh.phonebook.dao;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +87,25 @@ public class ContactDAO {
         }
 
         return results;
+    }
+
+    public boolean existsContactByNumber(String number){
+
+        String numberTmp = number;
+        Log.d("numberBEFORE:", numberTmp);
+
+        if (number.contains("+48")){
+            numberTmp = number.substring(3);
+            Log.d("numberAFTER:", numberTmp);
+
+        }
+        Cursor cursor = dbHelper.getReadableDatabase().rawQuery(
+                "select * from contacts where contact_phone_number = '"+numberTmp+"'",
+                null
+        );
+        if(cursor.getCount() > 0){
+            return true;
+        } else return false;
     }
 
 }
